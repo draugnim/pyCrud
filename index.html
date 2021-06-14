@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+    <link
+      rel="stylesheet"
+      href="./Leaflet.markercluster-1.4.1/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css"
+    />
+    <script src="/Leaflet.markercluster-1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="/leaflet.markercluster.freezable.js"></script>
+    <script
+      type="text/javascript"
+      src="qrc:///qtwebchannel/qwebchannel.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="http://maps.stamen.com/js/tile.stamen.js?v1.3.0"
+    ></script>
+  </head>
+  <body style="height: 100%; margin: 0">
+    <div id="mapid" style="height: 100%"></div>
+    <script>
+      var clusterOn = true;
+
+      var balloonIcon = L.icon({
+        iconUrl: "balloon.png",
+        iconSize: [20, 44], // size of the icon
+        iconAnchor: [10, 44], // point of the icon which will correspond to marker's location
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
+
+      var balloonHighlightedIcon = L.icon({
+        iconUrl: "balloon_highlighted.png",
+        iconSize: [30, 66], // size of the icon
+        iconAnchor: [15, 66], // point of the icon which will correspond to marker's location
+        popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+      });
+
+      var highlight = {
+        color: "#333333",
+        weight: 2,
+        opacity: 1,
+      };
+
+      /*       L.Map.include({
+        getMarkerByIndex: function (index) {
+          var marker = null;
+          this.eachLayer(function (layer) {
+            if (layer instanceof L.markerClusterGroup) {
+              layer.forEach((element) => {
+                if (element instanceof L.marker) {
+                  if (layer.proprerties.index === index) {
+                    marker = layer;
+                  }
+                }
+              });
+            }
+          });
+          return marker;
+        },
+      }); */
+
+      L.Map.include({
+        marker: null,
+        getMarkerByIndex: function (markerIndex) {
+          this.eachLayer(function (layer) {
+            if (layer instanceof L.Marker) {
+              if (typeof layer.properties.index !== "undefined") {
+                if (layer.properties.index === markerIndex) {
+                  marker = layer;
+                }
+              }
+            }
+          });
+          return marker;
+        },
+      });
+
+      var layer = new L.StamenTileLayer("toner");
+      var mymap = L.map("mapid").setView([44.0718, 17.578125], 7);
+      //https://tile.openstreetmap.org/{z}/{x}/{y}.png
+      L.tileLayer("http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg", {
+        maxZoom: 18,
+      }).addTo(mymap);
+
+      var prevMarker = null;
+
+      var markers = {};
+
+      var markersCluster = L.markerClusterGroup();
+
+      function testJs(markerLst) {
+        markerLst.forEach((element) => {
+          var markerIndex = element["index"];
+          var markerName = element["name"];
+          var marker = new L.marker(element["geometry"], {
+            icon: balloonIcon,
+          });
+          marker.properties = {};
+          marker.properties.name = markerName;
+          marker.properties.index = markerIndex;
+          marker.on("click", function (event) {
+            //  alert(marker.proprerties.name);
+            new QWebChannel(qt.webChannelTransport, function (channel) {
+              backend = channel.objects.handler;
+              backend.markerClicked(marker.properties.index);
+            });
+            marker.setIcon(balloonHighlightedIcon);
+            if (prevMarker === null) {
+              prevMarker = marker;
+            } else {
+              prevMarker.setIcon(balloonIcon);
+              prevMarker = marker;
+            }
+          });
+          markers[markerIndex] = marker;
+          markersCluster.addLayer(marker);
+        });
+        mymap.addLayer(markersCluster);
+      }
+
+      function findMarker(index) {
+        try {
+          var marker = markers[index];
+        } catch (error) {
+          alert(error);
+        }
+
+        var latLngs = [marker.getLatLng()];
+        //var markerBounds = L.latLngBounds(latLngs);
+        //mymap.fitBounds(markerBounds);
+        mymap.setView([latLngs[0].lat, latLngs[0].lng], 16);
+        marker.setIcon(balloonHighlightedIcon);
+
+        if (prevMarker === null) {
+          prevMarker = marker;
+        } else {
+          prevMarker.setIcon(balloonIcon);
+          prevMarker = marker;
+        }
+      }
+
+      function toggleCluster() {
+        if (clusterOn) {
+          markersCluster.disableClustering();
+          clusterOn = false;
+        } else {
+          markersCluster.enableClustering();
+          clusterOn = true;
+        }
+      }
+    </script>
+  </body>
+</html>

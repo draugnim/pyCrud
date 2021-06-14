@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RadioSondes</class>
+ <widget class="QMainWindow" name="RadioSondes">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>828</width>
+    <height>605</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Radio Sondes Tracker</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QTableWidget" name="tableWidget"/>
+      <widget class="QTableWidget" name="tableWidget_2">
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string>name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>time</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>course</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>speed</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>symbol</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>srccall</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>dstcall</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>comment</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>path</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>geometry</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>metadata</string>
+        </property>
+       </column>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>828</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuConnect">
+    <property name="title">
+     <string>Connect</string>
+    </property>
+    <addaction name="actionNew_DB_Connection"/>
+   </widget>
+   <addaction name="menuConnect"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNew_DB_Connection">
+   <property name="text">
+    <string>New DB Connection</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
